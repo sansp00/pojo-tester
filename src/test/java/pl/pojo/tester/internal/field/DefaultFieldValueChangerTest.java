@@ -1,7 +1,6 @@
 package pl.pojo.tester.internal.field;
 
-import org.junit.jupiter.api.Test;
-import pl.pojo.tester.internal.field.date.DefaultDateAndTimeFieldValueChanger;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +15,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
+
+import pl.pojo.tester.internal.field.date.DefaultDateAndTimeFieldValueChanger;
 
 class DefaultFieldValueChangerTest {
 
@@ -49,10 +51,22 @@ class DefaultFieldValueChangerTest {
         assertThat(result.size()).isNotEqualTo(expectedResult.size());
     }
 
+    
+    private Set<Class> getClassesForPackage(final String pckgname) throws ClassNotFoundException {
+    	Set<Class<? extends AbstractFieldValueChanger>> subTypes =  new Reflections(pckgname).getSubTypesOf(AbstractFieldValueChanger.class);
+   	
+        return subTypes.stream()
+                .filter(AbstractFieldValueChanger.class::isAssignableFrom)
+                .filter(clazz -> !clazz.isAnonymousClass())
+                .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+                .filter(clazz -> !clazz.getName().endsWith("Test"))
+                .collect(Collectors.toSet());
+    }
+    
     /**
      * http://stackoverflow.com/a/39006103/3640655
      */
-    private Set<Class> getClassesForPackage(final String pckgname) throws ClassNotFoundException {
+    private Set<Class> getClassesForPackageOld(final String pckgname) throws ClassNotFoundException {
         // This will hold a list of directories matching the pckgname. There may be more than one if a package is split over multiple jars/paths
         final ArrayList<File> directories = new ArrayList<>();
         final String packageToPath = pckgname.replace('.', '/');

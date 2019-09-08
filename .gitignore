@@ -16,3 +16,8 @@ out
 .java-version
 lombok.config
 .DS_Store
+/target
+/.classpath
+/.project
+/.settings
+/bin
