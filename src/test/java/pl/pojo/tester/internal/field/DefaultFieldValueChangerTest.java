@@ -54,10 +54,12 @@ class DefaultFieldValueChangerTest {
     
     private Set<Class> getClassesForPackage(final String pckgname) throws ClassNotFoundException {
     	Set<Class<? extends AbstractFieldValueChanger>> subTypes =  new Reflections(pckgname).getSubTypesOf(AbstractFieldValueChanger.class);
+   	
         return subTypes.stream()
                 .filter(AbstractFieldValueChanger.class::isAssignableFrom)
                 .filter(clazz -> !clazz.isAnonymousClass())
                 .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+                .filter(clazz -> !clazz.getName().endsWith("Test"))
                 .collect(Collectors.toSet());
     }
     
